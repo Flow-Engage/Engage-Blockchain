@@ -494,8 +494,17 @@ pub contract Engage: NonFungibleToken {
             return newCategoryID
 
 		}
-
-        pub fun createMatch(_name: String, _platformID: UInt64, _categoryName: String):UInt64? {
+		// createMatch creates a new Match resource and stores it
+        // in the Match mapping in the Engage contract
+        //
+        // Parameters: name: The name of the Match
+        //             platformID: the ID of the platform this Match belongs to
+        //             categoryName: the Name of the category this Match belongs to
+        //              inside the specified platform
+        //
+        // Returns: The ID of the created Match
+        //
+        pub fun createMatch(_name: String, _platformID: UInt64, _categoryName: String):UInt64 {
             pre {
                 Engage.platforms[_platformID] != nil: "This Platform doesn't exist"
             }
@@ -504,6 +513,30 @@ pub contract Engage: NonFungibleToken {
             let newMatchID = platformRef.addMatchToCategory(categoryName: _categoryName, matchName: _name)
 
             return newMatchID
+        }
+
+        pub fun createNFTs(
+            _matchID: UInt64,
+            _quantity: UInt64,
+            _name: String,
+            _description: String,
+            _extras: {String: AnyStruct},
+            _imgURL: String
+            ):@Collection {
+            pre {
+                Engage.matches[_matchID] != nil: "This Match doesn't exist"
+            }
+
+            let matchRef = (&Engage.matches[_matchID] as &Match?)!
+            let newCollection <- matchRef.mintNFTs(
+                quantity: _quantity,
+                name: _name,
+                description: _description,
+                extras: _extras,
+                imgURL: _imgURL
+                )
+
+            return <- newCollection
         }
 
         // create a new Administrator resource
