@@ -452,6 +452,22 @@ pub contract Engage: NonFungibleToken {
 
 			emit Deposit(id: id, to: self.owner?.address)
 		}
+        // batchDeposit takes a Collection object as an argument
+        // and deposits each contained NFT into this Collection
+        pub fun batchDeposit(tokens: @NonFungibleToken.Collection) {
+
+            // Get an array of the IDs to be deposited
+            let keys = tokens.getIDs()
+
+            // Iterate through the keys in the collection and deposit each one
+            for key in keys {
+                self.deposit(token: <-tokens.withdraw(withdrawID: key))
+            }
+
+            // Destroy the empty Collection
+            destroy tokens
+        }
+
 		// GetIDs returns an array of the IDs that are in the collection
 		pub fun getIDs(): [UInt64] {
 			return self.ownedNFTs.keys
