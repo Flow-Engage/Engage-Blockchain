@@ -596,6 +596,19 @@ pub contract Engage: NonFungibleToken {
         }
     }
 
+    // getPlatformCategories returns the categories inside the specified platform
+    // 
+    // Parameters: platformID: The id of the platform that is being searched
+    //
+    // Returns: dictionary of categories names mapped to their ID
+    pub fun getPlatformCategories(_platformID: UInt64): {String: UInt64}? {
+        if Engage.platforms[_platformID] == nil {
+            return nil
+        } else {
+            return QueryPlatformData(platformID: _platformID).getCategories()
+        }
+    }
+
     // Get information about a NFTMetadata
 	pub fun getNFTMetadata(_ metadataID: UInt64): NFTMetadata? {
 		return self.nftMetadatas[metadataID]

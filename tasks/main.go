@@ -30,4 +30,18 @@ func main() {
 	o.Script("getPlatformData", WithArg("platformID", "0"))
 	color.Green("-----------------------------PASSED---------------------")
 
+	// Adminitrator should be able to create a new Category
+	color.Red("Should be able to create new Category")
+	o.Tx(
+		"create_category",
+		WithSigner("account"),
+		WithArg("categoryName", "Soccer"),
+		WithArg("platformID", "0"),
+	)
+	color.Green("-----------------------------PASSED---------------------")
+
+	color.Red("New Series should be in the platform's data")
+	o.Script("getPlatformData", WithArg("platformID", "0"))
+	color.Green("-----------------------------PASSED---------------------")
+
 }
