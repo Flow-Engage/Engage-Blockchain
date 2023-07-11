@@ -40,8 +40,23 @@ func main() {
 	)
 	color.Green("-----------------------------PASSED---------------------")
 
-	color.Red("New Series should be in the platform's data")
+	color.Red("New Category should be in the platform's data")
 	o.Script("getPlatformData", WithArg("platformID", "0"))
+	color.Green("-----------------------------PASSED---------------------")
+
+	// Adminitrator should be able to create a new Match
+	color.Red("Should be able to create new Match")
+	o.Tx(
+		"create_match",
+		WithSigner("account"),
+		WithArg("matchName", "Champion League"),
+		WithArg("categoryName", "Soccer"),
+		WithArg("platformID", "0"),
+	)
+	color.Green("-----------------------------PASSED---------------------")
+
+	color.Red("New Match should be in the category's data")
+	o.Script("getCategoryData", WithArg("categoryID", "0"))
 	color.Green("-----------------------------PASSED---------------------")
 
 }

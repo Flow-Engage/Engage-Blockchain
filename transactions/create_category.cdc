@@ -27,6 +27,6 @@ transaction(categoryName: String, platformID: UInt64) {
 
     post {
         Engage.getPlatformCategories(_platformID: platformID)?.containsKey(categoryName)!:
-          "Could not find the specified set"
+          "Could not find the specified category"
     } 
 }

@@ -153,6 +153,7 @@ pub contract Engage: NonFungibleToken {
         // addCategory adds a category to the Platform
         //
         // Parameters: categoryID: The ID of the Category resource that is being added
+        // Returns categoryID to verify transaction
         pub fun addMatch(matchName: String): UInt64 {
             pre {
                 self.matches[matchName] == nil: "This match already exists"
@@ -174,7 +175,7 @@ pub contract Engage: NonFungibleToken {
 			// Store it in the matches mapping field inside the contract
             Engage.matches[newMatchID] <-! newMatch
 
-            return newMatchID
+            return self.categoryID
         }
 	}
 
@@ -253,7 +254,7 @@ pub contract Engage: NonFungibleToken {
 
         init(platformID: UInt64) {
             pre {
-                Engage.platforms[platformID] != nil: "The platform with the provided ID does not exist"
+                Engage.platforms[platformID] != nil: "The Platform with the provided ID does not exist"
             }
 
             let platformRef = (&Engage.platforms[platformID] as &Platform?)!
@@ -265,6 +266,31 @@ pub contract Engage: NonFungibleToken {
 
         pub fun getCategories(): {String: UInt64} {
             return self.categories
+        }
+    }
+
+    // Same a QueryPlatformData but for categories
+    pub struct QueryCategoryData {
+        pub let platformID: UInt64
+        pub let platformName: String
+        pub let name: String
+        access(self) var matches: {String: UInt64}
+
+        init(categoryID: UInt64) {
+            pre {
+                Engage.categories[categoryID] != nil: "The Category with the provided ID does not exist"
+            }
+
+            let categoryRef = (&Engage.categories[categoryID] as &Category?)!
+
+            self.platformID = categoryRef.platformID
+            self.platformName = categoryRef.platformName
+            self.name = categoryRef.name
+            self.matches = categoryRef.matches
+        }
+
+        pub fun getMatches(): {String: UInt64} {
+            return self.matches
         }
     }
 
@@ -606,6 +632,27 @@ pub contract Engage: NonFungibleToken {
             return nil
         } else {
             return QueryPlatformData(platformID: _platformID).getCategories()
+        }
+    }
+
+    // Same as getPlatformData but for Category
+    pub fun getCategoryData(_categoryID: UInt64): QueryCategoryData? {
+        if Engage.platforms[_categoryID] == nil {
+            return nil
+        } else {
+            return QueryCategoryData(categoryID: _categoryID)
+        }
+    }
+    // getCategoryMatches returns the matches inside the specified platform
+    // 
+    // Parameters: categoryID: The id of the category that is being searched
+    //
+    // Returns: dictionary of matches names mapped to their ID
+    pub fun getCategoryMatches(_categoryID: UInt64): {String: UInt64}? {
+        if Engage.platforms[_categoryID] == nil {
+            return nil
+        } else {
+            return QueryCategoryData(categoryID: _categoryID).getMatches()
         }
     }
 

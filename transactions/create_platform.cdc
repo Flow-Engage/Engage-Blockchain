@@ -24,6 +24,6 @@ transaction(platformName: String) {
 
     post {
         Engage.getPlatformData(_platformID: self.newPlatformID)?.name == platformName:
-          "Could not find the specified set"
+          "Could not find the specified platform"
     }
 }
