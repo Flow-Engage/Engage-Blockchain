@@ -17,6 +17,17 @@ func main() {
 	fmt.Println("Press any key to continue")
 	fmt.Scanln()
 
-	// Setup Bob's account to hold a Engange NFT
-	color.Red("Should be able to setup Bob's account with Engage collection path")
+	// Adminitrator should be able to create a new Platform
+	color.Red("Should be able to create new Platform")
+	o.Tx(
+		"create_platform",
+		WithSigner("account"),
+		WithArg("platformName", "Sports"),
+	)
+	color.Green("-----------------------------PASSED---------------------")
+
+	color.Red("Should be able to read the new Platform's data with any account")
+	o.Script("getPlatformData", WithArg("platformID", "0"))
+	color.Green("-----------------------------PASSED---------------------")
+
 }
