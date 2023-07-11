@@ -241,6 +241,34 @@ pub contract Engage: NonFungibleToken {
         }
 	}
 
+    // Struct that contains all of the important data about a platform
+    // Can be easily queried by instantiating the `QueryPlatformData` object
+    // with the desired Platform ID
+    // let platformData = Engage.QueryPlatformData(platformID: 12)
+    //
+    pub struct QueryPlatformData {
+        pub let platformID: UInt64
+        pub let name: String
+        access(self) var categories: {String: UInt64}
+
+        init(platformID: UInt64) {
+            pre {
+                Engage.platforms[platformID] != nil: "The platform with the provided ID does not exist"
+            }
+
+            let platformRef = (&Engage.platforms[platformID] as &Platform?)!
+
+            self.platformID = platformRef.platformID
+            self.name = platformRef.name
+            self.categories = platformRef.categories
+        }
+
+        pub fun getCategories(): {String: UInt64} {
+            return self.categories
+        }
+    }
+
+
     pub struct NFTMetadata {
 	pub let metadataID: UInt64
 	pub let matchID: UInt64
@@ -554,6 +582,20 @@ pub contract Engage: NonFungibleToken {
 		return <- create Collection()
 	}
 
+    // getPlatformData returns the data that the specified platform
+    //            is associated with.
+    // 
+    // Parameters: platformID: The id of the platform that is being searched
+    //
+    // Returns: The QueryPlatformData struct that has all the important information about the platform
+    pub fun getPlatformData(_platformID: UInt64): QueryPlatformData? {
+        if Engage.platforms[_platformID] == nil {
+            return nil
+        } else {
+            return QueryPlatformData(platformID: _platformID)
+        }
+    }
+
     // Get information about a NFTMetadata
 	pub fun getNFTMetadata(_ metadataID: UInt64): NFTMetadata? {
 		return self.nftMetadatas[metadataID]
@@ -573,7 +615,7 @@ pub contract Engage: NonFungibleToken {
         self.nextMetadataID = 0
         self.totalSupply = 0
 
-		// Set the named paths
+		// platform the named paths
 		self.CollectionStoragePath = /storage/EngageCollection
 		self.CollectionPublicPath = /public/EngageCollection
 		self.CollectionPrivatePath = /private/EngageCollection
