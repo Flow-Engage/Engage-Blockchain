@@ -41,9 +41,10 @@ transaction(
             _imgURL: imgURL
             )
         
-        let receiverRef = acct.getCapability(Engage.CollectionPublicPath).borrow<&Engage.Collection>()
+        let receiverRef = acct.getCapability(Engage.CollectionPublicPath).borrow<&Engage.Collection{Engage.EngageCollectionPublic}>()
             ?? panic("Cannot borrow a reference to the recipient's collection")
         // deposit the NFT in the receivers collection
+
         receiverRef.batchDeposit(tokens: <- collection)
 
     }

@@ -59,4 +59,22 @@ func main() {
 	o.Script("getCategoryData", WithArg("categoryID", "0"))
 	color.Green("-----------------------------PASSED---------------------")
 
+	// Adminitrator should be able to create a new NFTs for a match
+	color.Red("Should be able to create new NFTs")
+	o.Tx(
+		"mint_nfts",
+		WithSigner("account"),
+		WithArg("matchID", "0"),
+		WithArg("quantity", "10"),
+		WithArg("name", "Germany"),
+		WithArg("description", "Best players in Europe"),
+		WithArg("extras", `{}`),
+		WithArg("imgURL", "google.com"),
+	)
+	color.Green("-----------------------------PASSED---------------------")
+
+	color.Red("New NFTMetadata should be in the contract")
+	o.Script("get_metadata", WithArg("metadataID", "0"))
+	color.Green("-----------------------------PASSED---------------------")
+
 }

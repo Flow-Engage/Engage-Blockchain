@@ -227,6 +227,9 @@ pub contract Engage: NonFungibleToken {
 					),
                 _extra: extras,
                 _matchID: self.matchID,
+                _matchName: self.name,
+                _categoryName: self.categoryName,
+                _platformName: self.platformName
                 ) 
 
 
@@ -298,6 +301,9 @@ pub contract Engage: NonFungibleToken {
     pub struct NFTMetadata {
 	pub let metadataID: UInt64
 	pub let matchID: UInt64
+    pub let matchName: String
+    pub let categoryName: String
+    pub let platformName: String
     pub let name: String
 	pub let description: String
 	pub let image: MetadataViews.HTTPFile
@@ -312,9 +318,15 @@ pub contract Engage: NonFungibleToken {
             _image: MetadataViews.HTTPFile,
             _extra: {String: AnyStruct},
             _matchID: UInt64,
+            _matchName: String,
+            _categoryName: String,
+            _platformName: String,
             ) {
 			self.metadataID = _metadataID
 			self.matchID = _matchID
+			self.matchName = _matchName
+			self.categoryName = _categoryName
+			self.platformName = _platformName
             self.name = _name
 			self.description = _description
 			self.image = _image
@@ -352,12 +364,12 @@ pub contract Engage: NonFungibleToken {
             // Gotta change this to UUID in the case that we implement burning
             Engage.totalSupply = Engage.totalSupply + 1
             // Assign serial number to the NFT based on the number of minted NFTs
-			let metadataRef = (Engage.nftMetadatas[_metadataID])!
+			let metadataRef: Engage.NFTMetadata = (Engage.nftMetadatas[_metadataID] as NFTMetadata?)!
             self.id = Engage.totalSupply
             self.metadataID = _metadataID
             self.matchID = metadataRef.matchID
             self.serial = metadataRef.minted
-            // Update the total supply of this MetadataId by 1
+            // Update the total minted of this MetadataId by 1
 			metadataRef.updateMinted()
         }
 
@@ -430,7 +442,16 @@ pub contract Engage: NonFungibleToken {
         }   
     }
 
-	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection {
+    // This interface is neccesary for batch deposting
+    //
+    pub resource interface EngageCollectionPublic {
+        pub fun deposit(token: @NonFungibleToken.NFT)
+        pub fun batchDeposit(tokens: @NonFungibleToken.Collection)
+        pub fun getIDs(): [UInt64]
+        pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT
+    }
+
+	pub resource Collection: EngageCollectionPublic, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection {
 
 		pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
 		// Withdraw removes an NFT from the collection and moves it to the caller(for Trading)
@@ -702,7 +723,7 @@ pub contract Engage: NonFungibleToken {
 		self.account.save(<- collection, to: self.CollectionStoragePath)
 
 		// Create a public capability for the collection
-		self.account.link<&Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+		self.account.link<&Collection{EngageCollectionPublic, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
 			self.CollectionPublicPath,
 			target: self.CollectionStoragePath
 		)
