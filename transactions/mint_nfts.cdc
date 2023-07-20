@@ -18,7 +18,6 @@ transaction(
         quantity: UInt64,
         name: String,
         description: String,
-        extras: {String: AnyStruct},
         imgURL: String
     ) {
     
@@ -37,7 +36,7 @@ transaction(
             _quantity: quantity,
             _name: name,
             _description: description,
-            _extras: extras,
+            _extras: {},
             _imgURL: imgURL
             )
         

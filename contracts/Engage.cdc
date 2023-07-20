@@ -330,9 +330,13 @@ pub contract Engage: NonFungibleToken {
             self.name = _name
 			self.description = _description
 			self.image = _image
-			self.extra = _extra
+			self.extra = {}
 			self.minted = 0
 			self.purchasers = {}
+
+            self.extra["Platform"] = self.platformName
+            self.extra["Category"] = self.categoryName
+            self.extra["Match"] = self.matchName
 		}
         // Function to update the list of buyers
 		access(account) fun purchased(nftID: UInt64, buyer: Address) {
@@ -364,7 +368,7 @@ pub contract Engage: NonFungibleToken {
             // Gotta change this to UUID in the case that we implement burning
             Engage.totalSupply = Engage.totalSupply + 1
             // Assign serial number to the NFT based on the number of minted NFTs
-			let metadataRef: Engage.NFTMetadata = (Engage.nftMetadatas[_metadataID] as NFTMetadata?)!
+			let metadataRef: &Engage.NFTMetadata = (&Engage.nftMetadatas[_metadataID] as &NFTMetadata?)!
             self.id = Engage.totalSupply
             self.metadataID = _metadataID
             self.matchID = metadataRef.matchID
