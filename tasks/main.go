@@ -24,6 +24,11 @@ func main() {
 		WithSigner("account"),
 		WithArg("platformName", "Sports"),
 	)
+	o.Tx(
+		"create_platform",
+		WithSigner("account"),
+		WithArg("platformName", "Politics"),
+	)
 	color.Green("-----------------------------PASSED---------------------")
 
 	color.Red("Should be able to read the new Platform's data with any account")
@@ -68,7 +73,6 @@ func main() {
 		WithArg("quantity", "10"),
 		WithArg("name", "Germany"),
 		WithArg("description", "Best players in Europe"),
-		WithArg("extras", `{}`),
 		WithArg("imgURL", "google.com"),
 	)
 	color.Green("-----------------------------PASSED---------------------")
@@ -77,4 +81,7 @@ func main() {
 	o.Script("get_metadata", WithArg("metadataID", "0"))
 	color.Green("-----------------------------PASSED---------------------")
 
+	color.Red("Fetch all Platforms")
+	o.Script("get_all_platforms")
+	color.Green("-----------------------------PASSED---------------------")
 }
